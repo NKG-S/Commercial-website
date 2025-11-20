@@ -1,0 +1,5 @@
+commercial-web-back/.env
+commercial-web-back/node_modules
+commercial-web-front/node_modules
+commercial-web-back/package-lock.json
+commercial-web-front/package-lock.json
