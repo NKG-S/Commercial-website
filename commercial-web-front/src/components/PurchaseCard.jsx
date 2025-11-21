@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, CreditCard, ShieldCheck } from "lucide-react";
-import Header from "../components/Header.jsx";
-// import Header from "../components/Header.jsx"; // Commented out to prevent build error
 
 export default function PurchaseCard() {
   const { productId } = useParams();
@@ -83,7 +81,6 @@ export default function PurchaseCard() {
 
   return (
     <>
-      <Header />
       <div className="min-h-screen bg-[#012561] text-white pt-24 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           

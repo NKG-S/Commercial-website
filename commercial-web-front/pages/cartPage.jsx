@@ -216,7 +216,7 @@ const CartPage = () => {
 
                 <button 
                     className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200"
-                    onClick={() => alert("Proceed to Checkout integration needed!")}
+                    onClick={() => navigate("/checkout", { state: { cartItems } })}
                 >
                   Proceed to Checkout
                 </button>

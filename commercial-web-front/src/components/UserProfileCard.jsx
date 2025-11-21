@@ -6,7 +6,6 @@ import { Camera, Edit, X, Save, User, Mail, Shield, Calendar } from "lucide-reac
 
 // Import your Supabase functions
 import { uploadProfilePicture, deleteImageFromSupabase } from "../utils/SupabaseUploader";
-import Header from "./Header";
 const URL = "http://localhost:3000";
 const API_URL = `${URL}/api/user/profile`; 
 
@@ -175,7 +174,6 @@ export default function UserProfileCard() {
 
   return (
     <>
-    <Header />
         <section className="py-10 min-h-screen bg-gray-900 font-sans">
             <div className="lg:w-[80%] md:w-[90%] xs:w-[96%] mx-auto">
                 

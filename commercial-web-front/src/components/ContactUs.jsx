@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Github, Twitter, Linkedin, CheckCircle, ArrowRight } from 'lucide-react';
-import Header from '../components/Header.jsx';
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
@@ -34,7 +33,6 @@ export default function ContactUs() {
 
   return (
     <>
-    <Header/>
     <div className="min-h-screen w-full flex items-center justify-center bg-[#0f0c29] bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4 relative overflow-hidden font-sans selection:bg-purple-500 selection:text-white">
       
       {/* Realistic Ambient Background Lighting */}

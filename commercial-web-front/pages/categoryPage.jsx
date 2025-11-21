@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Search, Grid, List, Loader, TrendingUp, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Header from "../src/components/Header";
 import CategoryCard from "../src/components/CategoryCard";
 
 export default function CategoryPage() {
@@ -144,8 +143,6 @@ export default function CategoryPage() {
 
   return (
     <>
-      <Header />
-      
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -211,11 +208,12 @@ export default function CategoryPage() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-3 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-w-[200px]"
                 >
-                  <option value="name-az">Name: A-Z</option>
-                  <option value="name-za">Name: Z-A</option>
-                  <option value="most-products">Most Products</option>
-                  <option value="least-products">Least Products</option>
+                  <option value="default" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}> Sort by: Featured </option>
+                  <option value="price-low" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}> Price: Low to High </option>
+                  <option value="price-high" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}> Price: High to Low </option>
+                  <option value="name" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}> Name: A-Z </option>
                 </select>
+                
               </div>
 
               {/* View Mode Toggle */}

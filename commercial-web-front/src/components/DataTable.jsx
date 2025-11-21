@@ -419,238 +419,338 @@ const DataTable = ({ reloadKey }) => {
 
       {/* EDIT MODAL */}
       {isModalOpen && editingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8 p-8">
-            {/* Modal Header */}
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Edit Product</h2>
-                <button 
+        <div
+          className="relative z-50"
+          aria-labelledby="edit-product-modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Dark overlay */}
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+          {/* Modal container */}
+          <div className="fixed inset-0 z-10 overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              {/* Modal Card */}
+              <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full sm:my-8 sm:w-full sm:max-w-4xl">
+                
+                {/* Header */}
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center border-b border-gray-100">
+                  <h3
+                    className="text-lg font-semibold leading-6 text-gray-900"
+                    id="edit-product-modal-title"
+                  >
+                    Edit Product
+                  </h3>
+                  <button
                     onClick={handleClose}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                    aria-label="Close modal"
-                >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    aria-label="Close edit product modal"
+                  >
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
-                </button>
-            </div>
+                  </button>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Product ID - Read Only */}
-              <div className="md:col-span-2">
-                <label htmlFor="edit-productID" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Product ID (Read-only)
-                </label>
-                <input
-                  type="text"
-                  id="edit-productID"
-                  name="productID"
-                  value={formData.productID || ""}
-                  disabled
-                  className="p-3 border rounded-lg bg-gray-100 cursor-not-allowed w-full"
-                />
-              </div>
-
-              {/* Product Name */}
-              <div className="md:col-span-2">
-                <label htmlFor="edit-name" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Product Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="edit-name"
-                    name="name"
-                    value={formData.name || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    required
-                />
-              </div>
-
-              {/* Brand */}
-              <div>
-                <label htmlFor="edit-brand" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Brand <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="edit-brand"
-                    name="brand"
-                    value={formData.brand || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    required
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label htmlFor="edit-category" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Category <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="edit-category"
-                    name="category"
-                    value={formData.category || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    required
-                />
-              </div>
-
-              {/* Price */}
-              <div>
-                <label htmlFor="edit-price" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Price (LKR) <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="number"
-                    id="edit-price"
-                    name="price"
-                    value={formData.price || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    min="0"
-                    step="0.01"
-                    required
-                />
-              </div>
-
-              {/* Labelled Price */}
-              <div>
-                <label htmlFor="edit-labelledPrice" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    MRP / Labelled Price
-                </label>
-                <input
-                    type="number"
-                    id="edit-labelledPrice"
-                    name="labelledPrice"
-                    value={formData.labelledPrice || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    min="0"
-                    step="0.01"
-                />
-              </div>
-
-              {/* Stock */}
-              <div>
-                 <label htmlFor="edit-stock" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Stock Quantity
-                 </label>
-                <input
-                    type="number"
-                    id="edit-stock"
-                    name="stock"
-                    value={formData.stock || 0}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                    min="0"
-                />
-              </div>
-
-               {/* Alt Name */}
-               <div>
-                 <label htmlFor="edit-altName" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Alternate Name
-                 </label>
-                 <input
-                    type="text"
-                    id="edit-altName"
-                    name="altName"
-                    value={formData.altName || ""}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSubmitting}
-                 />
-               </div>
-
-              {/* Images Info - Read Only */}
-              <div className="md:col-span-2">
-                <div className="p-3 border rounded-lg bg-gray-50">
-                  <p className="text-sm font-medium text-gray-700 mb-2">
-                    Product Images (Cannot be edited here)
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formData.images?.length || 0} image(s) currently associated with this product
-                  </p>
-                  {formData.images && formData.images.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {formData.images.map((url, idx) => (
-                        <img
-                          key={idx}
-                          src={url}
-                          alt={`Product ${idx + 1}`}
-                          className="w-16 h-16 object-cover rounded border"
+                {/* Body */}
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+                    {/* Product ID - Read Only */}
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="edit-productID"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Product ID (Read-only)
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          id="edit-productID"
+                          name="productID"
+                          value={formData.productID || ""}
+                          disabled
+                          className="block w-full rounded-md border-0 py-2 px-3 bg-gray-100 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 cursor-not-allowed sm:text-sm sm:leading-6"
                         />
-                      ))}
+                      </div>
                     </div>
-                  )}
+
+                    {/* Product Name */}
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="edit-name"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Product Name <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          id="edit-name"
+                          name="name"
+                          value={formData.name || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          required
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Brand */}
+                    <div>
+                      <label
+                        htmlFor="edit-brand"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Brand <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          id="edit-brand"
+                          name="brand"
+                          value={formData.brand || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          required
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label
+                        htmlFor="edit-category"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          id="edit-category"
+                          name="category"
+                          value={formData.category || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          required
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <label
+                        htmlFor="edit-price"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Price (LKR) <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="number"
+                          id="edit-price"
+                          name="price"
+                          value={formData.price || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          min="0"
+                          step="0.01"
+                          required
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Labelled Price */}
+                    <div>
+                      <label
+                        htmlFor="edit-labelledPrice"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        MRP / Labelled Price
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="number"
+                          id="edit-labelledPrice"
+                          name="labelledPrice"
+                          value={formData.labelledPrice || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          min="0"
+                          step="0.01"
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Stock */}
+                    <div>
+                      <label
+                        htmlFor="edit-stock"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Stock Quantity
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="number"
+                          id="edit-stock"
+                          name="stock"
+                          value={formData.stock ?? 0}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          min="0"
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Alt Name */}
+                    <div>
+                      <label
+                        htmlFor="edit-altName"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Alternate Name{" "}
+                        <span className="text-xs text-gray-500 font-normal">
+                          (Optional)
+                        </span>
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          id="edit-altName"
+                          name="altName"
+                          value={formData.altName || ""}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Images Info - Read Only */}
+                    <div className="sm:col-span-2">
+                      <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          Product Images (Cannot be edited here)
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formData.images?.length || 0} image(s) currently associated
+                          with this product
+                        </p>
+                        {formData.images && formData.images.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {formData.images.map((url, idx) => (
+                              <img
+                                key={idx}
+                                src={url}
+                                alt={`Product ${idx + 1}`}
+                                className="w-16 h-16 object-cover rounded border"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="edit-description"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Description <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-2">
+                        <textarea
+                          id="edit-description"
+                          name="description"
+                          value={formData.description || ""}
+                          onChange={handleInputChange}
+                          rows={4}
+                          disabled={isSubmitting}
+                          required
+                          className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Auto-Availability Info */}
+                    <div className="sm:col-span-2">
+                      <div
+                        className={`rounded-md p-4 ${
+                          Number(formData.stock) > 0
+                            ? "bg-green-50 border border-green-100"
+                            : "bg-red-50 border border-red-100"
+                        }`}
+                      >
+                        <h3
+                          className={`text-sm font-medium ${
+                            Number(formData.stock) > 0
+                              ? "text-green-800"
+                              : "text-red-800"
+                          }`}
+                        >
+                          Availability Status:{" "}
+                          {Number(formData.stock) > 0 ? "Available" : "Out of Stock"}
+                        </h3>
+                        <p
+                          className={`mt-1 text-xs ${
+                            Number(formData.stock) > 0
+                              ? "text-green-700"
+                              : "text-red-700"
+                          }`}
+                        >
+                          Availability is automatically set based on stock quantity.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Description */}
-              <div className="md:col-span-2">
-                <label htmlFor="edit-description" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-                    Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="edit-description"
-                  name="description"
-                  value={formData.description || ""}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-
-              {/* Auto-Availability Info */}
-              <div className="md:col-span-2">
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <span className="font-semibold">Availability Status:</span>{" "}
-                    {Number(formData.stock) > 0 ? (
-                      <span className="text-green-600 font-bold">Available (Stock: {formData.stock})</span>
-                    ) : (
-                      <span className="text-red-600 font-bold">Not Available (Out of Stock)</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Availability is automatically set based on stock quantity
-                  </p>
+                {/* Footer / Actions */}
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={handleUpdate}
+                    disabled={isSubmitting}
+                    className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "Updating..." : "Save Changes"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    disabled={isSubmitting}
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
                 </div>
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="mt-8 flex justify-end gap-4">
-              <button
-                onClick={handleClose}
-                className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Updating..." : "Save Changes"}
-              </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };

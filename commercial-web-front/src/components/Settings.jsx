@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "./Header";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -53,7 +52,6 @@ export default function Settings() {
 
   return (
     <>
-    <Header />
         <div className="min-h-screen bg-slate-900 pt-20 px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-8 border-b border-white/10 pb-4">Settings</h1>

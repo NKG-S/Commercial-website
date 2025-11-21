@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, ChevronDown, Loader } from "lucide-react";
-import Header from "../src/components/Header";
 import ProductCard from "../src/components/ProductCard";
 
 export default function ProductPage() {
@@ -111,7 +110,6 @@ export default function ProductPage() {
 
   return (
     <>
-      <Header />
       
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -161,9 +159,9 @@ export default function ProductPage() {
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-3 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="all">All Categories</option>
+                    <option value="all" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>All Categories</option>
                     {categories.filter(c => c !== "all").map(category => (
-                      <option key={category} value={category}>{category}</option>
+                      <option key={category} value={category} style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>{category}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -176,9 +174,9 @@ export default function ProductPage() {
                     onChange={(e) => setSelectedBrand(e.target.value)}
                     className="appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-3 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="all">All Brands</option>
+                    <option value="all" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>All Brands</option>
                     {brands.filter(b => b !== "all").map(brand => (
-                      <option key={brand} value={brand}>{brand}</option>
+                      <option key={brand} value={brand} style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>{brand}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -191,11 +189,11 @@ export default function ProductPage() {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-3 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="newest">Newest First</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="name-az">Name: A-Z</option>
-                    <option value="name-za">Name: Z-A</option>
+                    <option value="newest" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>Newest First</option>
+                    <option value="price-low" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>Price: Low to High</option>
+                    <option value="price-high" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>Price: High to Low</option>
+                    <option value="name-az" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>Name: A-Z</option>
+                    <option value="name-za" style={{ backgroundColor: "#1f2937", color: "#ffffff" }}>Name: Z-A</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>

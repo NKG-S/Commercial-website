@@ -2,9 +2,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Filter, SlidersHorizontal } from "lucide-react";
-
-// Added .jsx extension to imports to resolve build errors
-import Header from "../src/components/Header.jsx"; 
 import ProductCard from "../src/components/ProductCard.jsx";
 
 export default function CategoryShowPage() {
@@ -77,9 +74,7 @@ export default function CategoryShowPage() {
   });
 
   return (
-    <>
-      <Header />
-      
+    <>      
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
