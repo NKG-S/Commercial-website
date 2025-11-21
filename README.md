@@ -247,12 +247,6 @@ Contributions make the open-source community an amazing place to learn and creat
 
 ---
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
 ## 🙏 Acknowledgments
 
 - React & Vite teams for the amazing development experience
