@@ -602,36 +602,91 @@ npm install --legacy-peer-deps
 <div align="center">
 
 ### 🏠 Home Page
-![Home Page](https://via.placeholder.com/800x450/4F46E5/ffffff?text=Hero+Section+with+Featured+Products)
+![Home Page](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Home.png)
 *Modern hero section with featured products, categories, and promotional banners*
 
 ---
 
 ### 📦 Product Listing
-![Product Listing](https://via.placeholder.com/800x450/10B981/ffffff?text=Product+Grid+with+Search+%26+Filters)
+![Product Listing](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Product.png)
 *Responsive product grid with real-time search, category filters, and sorting options*
 
 ---
 
+### 🔍 Product Details
+![Product View](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Product_view.png)
+*Detailed product information with images, specifications, and purchase options*
+
+---
+
+### 🗂️ Category Navigation
+![Category](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Category.png)
+*Browse products organized by intuitive categories*
+
+---
+
+### 📂 Category Product View
+![Category View](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Catagory_view.png)
+*Filtered product display based on selected category*
+
+---
+
 ### 🛒 Shopping Cart
-![Shopping Cart](https://via.placeholder.com/800x450/F59E0B/ffffff?text=Cart+Management+Interface)
-*Interactive cart with quantity controls, price calculations, and checkout options*
+![Shopping Cart](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/cart.png)
+*Interactive cart with quantity controls and price calculations*
+
+---
+
+### 💳 Cart Checkout
+![Cart Checkout](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Cart_checkout.png)
+*Seamless checkout process for entire cart*
+
+---
+
+### 🛍️ Product Checkout
+![Product Checkout](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Product_checkout.png)
+*Quick checkout option for individual products*
+
+---
+
+### 👤 User Profile (View Mode)
+![Profile Uneditable](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Profile_uneditable.png)
+*User profile dashboard displaying personal information*
+
+---
+
+### ✏️ User Profile (Edit Mode)
+![Profile Editable](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Profile_editable.png)
+*Edit and update user profile information*
+
+---
+
+### 📧 Contact Us
+![Contact Us](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Contact_Us.png)
+*Customer support and inquiry contact form*
 
 ---
 
 ### 🛡️ Admin Dashboard
-![Admin Dashboard](https://via.placeholder.com/800x450/EF4444/ffffff?text=Product+Management+Dashboard)
-*Comprehensive admin panel for inventory management, product CRUD, and user oversight*
+![Admin Dashboard](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Admin.png)
+*Comprehensive admin panel for inventory management and user oversight*
 
 ---
 
-### 📱 Mobile Responsive
-![Mobile View](https://via.placeholder.com/400x700/8B5CF6/ffffff?text=Mobile+Responsive+Design)
-*Fully responsive design optimized for mobile, tablet, and desktop devices*
+### ➕ Add Product (Admin)
+![Add Product](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Add_Priduct.png)
+*Admin interface for creating new products with image upload*
+
+---
+
+### ✏️ Edit Product (Admin)
+![Edit Product](https://raw.githubusercontent.com/NKG-S/Commercial-website/main/Images/Edit_Product.png)
+*Admin interface for updating existing product details*
 
 </div>
 
 ---
+
 
 ## 🔗 Useful Links
 
