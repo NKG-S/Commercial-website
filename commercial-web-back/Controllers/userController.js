@@ -3,15 +3,41 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-dotenv.config();    
-const JWT_SECRET = process.env.JWT_SECRET
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
+// --- 1. Check Email Availability (Required for Frontend Step 1) ---
+// This function checks if an email exists without requiring a password.
+// It uses the same 'findOne' logic as login to ensure accuracy.
+export async function checkEmail(req, res) {
+    const { email } = req.body;
 
-// ChatGPT generated code for logInUser function
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+
+    try {
+        const normalizedEmail = email.toLowerCase().trim();
+        // Uses the same lookup logic as logInUser to see if user exists
+        const user = await User.findOne({ email: normalizedEmail });
+
+        if (user) {
+            // Frontend expects 409 if email is taken
+            return res.status(409).json({ message: "This email is already registered." });
+        }
+
+        // Frontend expects 200 if email is free to use
+        return res.status(200).json({ message: "Email is available" });
+    } catch (err) {
+        console.error("Check email error:", err);
+        return res.status(500).json({ message: "Server error checking email" });
+    }
+}
+
+// --- 2. Log In User ---
 export function logInUser(req, res) {
     const email = req.body.email;
     const password = req.body.password;
-    // const { email, password } = req.body;
 
     User.findOne({ email: email })
         .then(user => {
@@ -42,7 +68,7 @@ export function logInUser(req, res) {
             return res.json({
                 message: "Authentication successful",
                 token: token,
-                userdata : payload
+                userdata: payload
             });
         })
         .catch(err => {
@@ -51,7 +77,7 @@ export function logInUser(req, res) {
         });
 }
 
-
+// --- 3. Get Users (Admin Only) ---
 export function getUser(req, res) {
     // 1. No token / no decoded user
     if (!req.user) {
@@ -70,31 +96,30 @@ export function getUser(req, res) {
 
     // 4. Is admin → return all users
     User.find().select('-password').then(users => {
-            res.json(users);
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).json({ message: "Server error", error: err.message });
-        });
+        res.json(users);
+    })
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({ message: "Server error", error: err.message });
+    });
 }
 
-
-// ChatGPT generated code for createUser function
+// --- 4. Create User (Step 3 of Frontend Flow) ---
 export async function createUser(req, res) {
-    const { email, password, firstName, lastName, role } = req.body;
+    const { email, password, firstName, lastName, role, image } = req.body;
 
     // Basic validation
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !image) {
         return res.status(400).json({
-            message: "Email, password, first name, and last name are required"
+            message: "Email, password, first name, last name, and image are required"
         });
     }
 
     try {
-        // Normalize email (recommended)
+        // Normalize email
         const normalizedEmail = email.toLowerCase().trim();
 
-        // Check if user already exists
+        // Double check if user exists (Frontend checks first, but DB needs protection)
         const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
             return res.status(409).json({
@@ -111,14 +136,14 @@ export async function createUser(req, res) {
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             password: hashedPassword,
-            role: role || "customer",  // default to customer if not provided
-            // other defaults from schema will be applied automatically
+            role: role || "customer",
+            image: image, // Stores the array sent from frontend
         });
 
         // Save user
         await newUser.save();
 
-        // Success response (never send password back!)
+        // Success response
         res.status(201).json({
             message: "User created successfully",
             user: {
@@ -133,8 +158,8 @@ export async function createUser(req, res) {
         });
 
     } catch (err) {
-        // Handle duplicate email from MongoDB (in case of race condition)
-        if (err.code === 11000 || err.message.includes("duplicate key")) {
+        // Handle duplicate email from MongoDB unique index
+        if (err.code === 11000 || (err.message && err.message.includes("duplicate key"))) {
             return res.status(409).json({
                 message: "This email is already registered."
             });
@@ -147,82 +172,3 @@ export async function createUser(req, res) {
         });
     }
 }
-
-
-
-// My code for createUser function
-// export function createUser (req,res){
-
-//     const data = req.body;
-//     const hashedPassword = bcrypt.hashSync(data.password,10);   // 10 means password hash 10 times
-//     // res.json({
-//     //     hashedPassword : hashedPassword
-//     // })
-//     const user = new User(
-//         {
-//             email: data.email,
-//             firstName: data.firstName,
-//             lastName: data.lastName,
-//             password: hashedPassword,
-//             role: data.role
-//         }
-//     )
-//     console.log(user)
-//     user.save().then(() => {
-//         res.json( 
-//             { message : "user created successfully" }
-//                 )
-//             }
-//         )
-//     }
-
-
-
-
-
-
-// My code for logInUser function
-// export function logInUser(req,res){
-//     const email = req.body.email;
-//     const password = req.body.password;
-//     User.find({email : email}).then(
-//             (user) => {
-//                 if (user==null){
-
-//                     return res.status(401).json({message : "Authentication failed"})
-
-//                 }else{
-
-//                     // console.log(user[0])
-
-
-//                     const isPasswordValid = bcrypt.compareSync(password,user[0].password)
-                    
-                    
-//                     // res.json({matching : isPasswordValid})  // just for testing purpose
-
-//                     if (isPasswordValid){
-//                         const payload = {
-//                             email : user[0].email,
-//                             firstName : user[0].firstName,
-//                             lastName : user[0].lastName,
-//                             role : user[0].role
-//                         }
-
-//                         const token = jwt.sign(payload,"secretKey2000")
-                    
-                        
-//                         res.json(
-//                             {
-//                                 message : "Authentication successful",
-//                                 token : token
-//                             }
-//                         )
-
-//                     }else{
-//                         return res.status(401).json({message : "Authentication failed"})
-//                     }
-//                 }
-//             }
-//         )
-//     }

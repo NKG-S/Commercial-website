@@ -12,7 +12,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
  * @param {string} [folder="products"] - Folder prefix in the bucket.
  * @returns {Promise<string[]>} A promise that resolves to an array of public URLs.
  */
-export const SupabaseUploader = async (files, folder = "products") => {
+export const SupabaseDownloader = async (files, folder = "ProfilePictures") => {
   if (!files || files.length === 0) {
     return [];
   }
@@ -55,43 +55,3 @@ export const SupabaseUploader = async (files, folder = "products") => {
   return uploadedUrls;
 };
 
-/**
- * Uploads a single profile picture to Supabase Storage in ProfilePictures folder.
- * @param {File} file - A single File object for the profile picture.
- * @returns {Promise<string>} A promise that resolves to the public URL of the uploaded image.
- */
-export const uploadProfilePicture = async (file, folder = "profilePicture") => {
-  if (!file) {
-    throw new Error("No file provided for profile picture upload");
-  }
-
-  try {
-    const timestamp = Date.now();
-    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-    const filePath = `ProfilePictures/${timestamp}_${sanitizedFileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("images")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (uploadError) {
-      console.error("Supabase Upload Error:", uploadError);
-      throw new Error(
-        `Profile picture upload failed: ${uploadError.message}`
-      );
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("images").getPublicUrl(filePath);
-
-    console.log(`Successfully uploaded profile picture: ${publicUrl}`);
-    return publicUrl;
-  } catch (error) {
-    console.error(`Error uploading profile picture:`, error);
-    throw error;
-  }
-};

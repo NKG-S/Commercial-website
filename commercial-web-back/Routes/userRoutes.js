@@ -1,11 +1,18 @@
-// routes/userRoutes.js
 import express from "express";
-import { createUser, getUser, logInUser } from "../Controllers/userController.js";
+import { createUser, getUser, logInUser, checkEmail } from "../Controllers/userController.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/", createUser);        // register
-userRouter.post("/login", logInUser);    // login
-userRouter.post("/getUser", getUser);     // admin-only (checked in controller)
+// Route to check availability (Frontend Step 1)
+userRouter.post("/check-email", checkEmail);
+
+// Route to register a new user (Frontend Step 3)
+userRouter.post("/", createUser);
+
+// Route to login
+userRouter.post("/login", logInUser);
+
+// Route to get all users (Admin)
+userRouter.post("/getUser", getUser);
 
 export default userRouter;

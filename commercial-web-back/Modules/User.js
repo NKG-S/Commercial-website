@@ -32,8 +32,8 @@ const userSchema = new mongoose.Schema(
             default : false
         },
         image : {
-            type : String,
-            default : "/default_user.jpg"
+            type : [String],
+            required: [true, "At least one image is required"]
         }
 
     }

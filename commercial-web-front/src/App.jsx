@@ -5,7 +5,8 @@ import { AdminProductPage } from '../pages/adminProductPage.jsx'
 import { LoginAndRegistrationBackground } from '../pages/logAndRegPage.jsx'
 import ProductCard from './components/ProductCard.jsx'
 import { Toaster } from 'react-hot-toast'
-import Home from '../pages/home.jsx'
+import ProductPage from '../pages/productPage.jsx'
+import ProfilePage from '../pages/ProfilePage.jsx'
 
 
 
@@ -21,12 +22,12 @@ function App() {
 
 
         <Routes>
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<ProductPage />} />
           <Route path="/login" element={<LoginAndRegistrationBackground/>} />
           <Route path="/registration" element={<LoginAndRegistrationBackground/>} />
           <Route path="/forgot-password" element={<LoginAndRegistrationBackground />} />
-          <Route path="/register" element={<h1>Register</h1>} />
-          <Route path="/admin" element={<AdminProductPage/>} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/admin" element={<AdminProductPage />} />
           <Route path="/product" element={<ProductCard />} />
         </Routes>
         
