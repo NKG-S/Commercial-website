@@ -150,10 +150,11 @@ export default function RegistrationCard(props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const URL = "http://localhost:3000";
 
   // API Endpoints - Must match backend routes
-  const backEndUrlRegistration = "http://localhost:3000/api/user";
-  const checkEmailUrl = "http://localhost:3000/api/user/check-email"; 
+  const backEndUrlRegistration = `${URL}/api/user`;
+  const checkEmailUrl = `${URL}/api/user/check-email`; 
 
   const handleFilesChange = (files) => {
     setProfileImage(files);
@@ -217,6 +218,14 @@ export default function RegistrationCard(props) {
       setFormData({ name: '', email: '', password: '', confirmPassword: '' });
       setProfileImage([]);
       setAgreedToTerms(false);
+
+      // --- Added: Automatic Navigation to Login ---
+      if (props.onSwitchToLogin) {
+        // Slight delay to allow the user to see the "Success" toast
+        setTimeout(() => {
+          props.onSwitchToLogin();
+        }, 2000); 
+      }
 
     } catch (error) {
       console.error("Registration Process Error:", error);

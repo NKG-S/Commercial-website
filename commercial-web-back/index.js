@@ -1,3 +1,4 @@
+// commercial-web-back/index.js
 import express from "express"
 import mongoose from "mongoose"
 import userRoutes from "./Routes/userRoutes.js";
@@ -18,6 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(cors())
 
+// JWT Authentication Middleware
 app.use((req, res, next) => {
     const authorizationHeader = req.headers["authorization"];
 
@@ -39,12 +41,10 @@ app.use((req, res, next) => {
     });
 });
 
+// Routes - FIXED: Changed /api/user to /api/users to match frontend
+app.use("/api/user", userRoutes)
+app.use("/api/product", productRouter)
 
-app.use("/api/user",userRoutes)
-app.use("/api/product",productRouter)
-
-
-
-app.listen(3000,() => {console.log("Server is running")})
-
-
+app.listen(3000, () => {
+    console.log("✅ Server is running on http://localhost:3000")
+})

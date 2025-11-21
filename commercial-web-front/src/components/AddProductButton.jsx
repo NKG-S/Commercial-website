@@ -1,11 +1,12 @@
+// commercial-web-front/src/components/AddProductButton.jsx
 import axios from "axios";
 import toast from "react-hot-toast";
-import ImageUpload from "./ImageUpload.jsx"; // Assuming this is your file input component
+import ImageUpload from "./ImageUpload.jsx";
 import { useState, useCallback } from "react";
-import { SupabaseUploader } from "../utils/SupabaseUploader.js"; // Corrected import
+import { SupabaseUploader } from "../utils/SupabaseUploader.js";
 
 // --- Configuration ---
-const REACT_APP_API_BASE_URL = "http://localhost:3000"; // Should ideally come from .env
+const REACT_APP_API_BASE_URL = "http://localhost:3000";
 const API_BASE_URL = REACT_APP_API_BASE_URL;
 const ADD_PRODUCT_URL = `${API_BASE_URL}/api/product`;
 
@@ -26,8 +27,8 @@ const initialFormData = {
   labelledPrice: "",
   category: "",
   brand: "",
-  stock: 0,
-  isAvailable: true // will be overridden based on stock
+  stock: "0",
+  isAvailable: true
 };
 
 export const AddProductButton = ({ onProductAdded }) => {
@@ -36,36 +37,31 @@ export const AddProductButton = ({ onProductAdded }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  // Memoized reset function
   const resetForm = useCallback(() => {
     setFormData(initialFormData);
     setFilesToUpload([]);
   }, []);
 
-  // Handler to receive the list of selected files from ImageUpload
   const handleFilesSelection = (files) => {
     setFilesToUpload(files);
   };
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     setFormData((prev) => {
       let newValue = type === "checkbox" ? checked : value;
 
-      // Ensure stock is never negative and update isAvailable automatically
       if (name === "stock") {
         const raw = Number(newValue);
         const safeStock = isNaN(raw) || raw < 0 ? 0 : raw;
         newValue = String(safeStock);
 
-        const updated = {
+        return {
           ...prev,
           [name]: newValue,
-          isAvailable: safeStock > 0 // auto: stock 0 -> false, >0 -> true
+          isAvailable: safeStock > 0
         };
-        return updated;
       }
 
       return {
@@ -75,7 +71,6 @@ export const AddProductButton = ({ onProductAdded }) => {
     });
   };
 
-  // Handle modal close
   const handleClose = () => {
     if (isSubmitting) {
       toast.error("Please wait for the current operation to complete");
@@ -85,49 +80,49 @@ export const AddProductButton = ({ onProductAdded }) => {
     resetForm();
   };
 
-  // Handle product submission
   const handleAddProduct = async () => {
-    // Basic required field checks and validation
-    if (!formData.productID.trim()) {
+    // Trim all string values first
+    const trimmedProductId = formData.productID.trim();
+    const trimmedName = formData.name.trim();
+    const trimmedBrand = formData.brand.trim();
+    const trimmedCategory = formData.category.trim();
+    const trimmedDescription = formData.description.trim();
+    const trimmedAltName = formData.altName.trim();
+
+    // === VALIDATION ===
+    if (!trimmedProductId) {
       toast.error("Product ID is required");
       return;
     }
 
-    const trimmedProductId = formData.productID.trim();
-
     if (!isValidProductId(trimmedProductId)) {
-      toast.error(
-        "Invalid Product ID format. Use PRD followed by 6 digits (e.g., PRD000001)"
-      );
+      toast.error("Invalid Product ID format. Use PRD followed by 6 digits (e.g., PRD000001)");
       return;
     }
 
-    if (!formData.name.trim()) {
+    if (!trimmedName) {
       toast.error("Product Name is required");
+      return;
+    }
+
+    if (!trimmedBrand) {
+      toast.error("Brand is required");
+      return;
+    }
+
+    if (!trimmedCategory) {
+      toast.error("Category is required");
+      return;
+    }
+
+    if (!trimmedDescription || trimmedDescription.length < 10) {
+      toast.error("Description must be at least 10 characters");
       return;
     }
 
     const priceNum = Number(formData.price);
     if (isNaN(priceNum) || priceNum <= 0) {
       toast.error("Valid price is required");
-      return;
-    }
-
-    if (!formData.brand.trim()) {
-      toast.error("Brand is required");
-      return;
-    }
-
-    if (!formData.category.trim()) {
-      toast.error("Category is required");
-      return;
-    }
-
-    if (
-      !formData.description.trim() ||
-      formData.description.trim().length < 10
-    ) {
-      toast.error("Description must be at least 10 characters");
       return;
     }
 
@@ -146,13 +141,13 @@ export const AddProductButton = ({ onProductAdded }) => {
     const loadingToast = toast.loading("Validating product and saving...");
 
     try {
-      // 1️⃣ Get auth token BEFORE doing anything expensive
+      // 1️⃣ Get auth token
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Authentication token not found. Please login again.");
       }
 
-      // 2️⃣ Check if product already exists in DB
+      // 2️⃣ Check if product already exists
       try {
         const checkResponse = await axios.get(
           `${ADD_PRODUCT_URL}/${trimmedProductId}`,
@@ -164,7 +159,6 @@ export const AddProductButton = ({ onProductAdded }) => {
           }
         );
 
-        // If we reach here with status 200, product exists → DO NOT upload images or submit data
         if (checkResponse.status === 200 && checkResponse.data) {
           toast.error(`Product ID ${trimmedProductId} already exists!`, {
             id: loadingToast
@@ -176,62 +170,50 @@ export const AddProductButton = ({ onProductAdded }) => {
           const { status, data } = checkErr.response;
 
           if (status === 404) {
-            // ✅ Product does not exist → OK to proceed
+            // Product doesn't exist - OK to proceed
           } else if (status === 400) {
-            // Server also thinks ID is invalid → DO NOT upload images
-            const serverMsg =
-              data?.error || "Invalid Product ID format according to server";
+            const serverMsg = data?.error || "Invalid Product ID format according to server";
             toast.error(serverMsg, { id: loadingToast });
             return;
           } else {
-            // Any other error from server while checking → DO NOT upload images or submit data
-            const serverMsg =
-              data?.error ||
-              data?.message ||
-              `Failed to validate product ID (status ${status})`;
+            const serverMsg = data?.error || data?.message || `Failed to validate product ID (status ${status})`;
             toast.error(serverMsg, { id: loadingToast });
             return;
           }
         } else {
-          // Network or unexpected error → DO NOT upload images or submit data
           console.error("Error checking existing product:", checkErr);
-          toast.error(
-            "Failed to validate product ID. Please try again.",
-            { id: loadingToast }
-          );
+          toast.error("Failed to validate product ID. Please try again.", { id: loadingToast });
           return;
         }
       }
 
-      // 3️⃣ At this point:
-      //    - Product ID is valid
-      //    - Product with this ID does NOT exist in DB
-      //    → Now upload images
-
+      // 3️⃣ Upload images
       console.log("Uploading images to Supabase...");
       const uploadedImageUrls = await SupabaseUploader(filesToUpload);
       console.log("Images uploaded successfully:", uploadedImageUrls);
 
-      // 4️⃣ Prepare and submit product data
+      // 4️⃣ Prepare product data with STRICT TYPE CONVERSION
       const labelledPriceNum = Number(formData.labelledPrice);
-      const finalStock = isNaN(stockNum) || stockNum < 0 ? 0 : stockNum;
+      const finalStock = Math.max(0, stockNum); // Ensure non-negative
       const autoIsAvailable = finalStock > 0;
 
       const productData = {
-        ...formData,
         productID: trimmedProductId,
-        price: priceNum,
-        labelledPrice:
-          isNaN(labelledPriceNum) || labelledPriceNum <= 0
-            ? priceNum
-            : labelledPriceNum,
-        stock: finalStock,
-        isAvailable: autoIsAvailable, // auto based on stock
-        images: uploadedImageUrls
+        name: trimmedName,
+        altName: trimmedAltName || "", // Send empty string if no altName
+        description: trimmedDescription,
+        price: priceNum, // Already validated as number
+        labelledPrice: (isNaN(labelledPriceNum) || labelledPriceNum <= 0) ? priceNum : labelledPriceNum,
+        category: trimmedCategory,
+        brand: trimmedBrand,
+        stock: finalStock, // Must be number, not string
+        isAvailable: autoIsAvailable, // Must be boolean
+        images: uploadedImageUrls // Array of strings
       };
 
       console.log("Submitting product data:", productData);
 
+      // 5️⃣ Submit to backend
       const response = await axios.post(ADD_PRODUCT_URL, productData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -241,30 +223,21 @@ export const AddProductButton = ({ onProductAdded }) => {
 
       console.log("Server response:", response);
 
-      // Check for success or specific duplicate message (should not happen now, but kept as safety)
       if (response.status === 201 || response.status === 200) {
         if (response.data.message?.includes("already exists")) {
-          toast.error(
-            `Product ID ${trimmedProductId} already exists!`,
-            { id: loadingToast }
-          );
+          toast.error(`Product ID ${trimmedProductId} already exists!`, { id: loadingToast });
           return;
         }
 
-        // Success
         toast.success("Product added successfully!", { id: loadingToast });
         setIsAdding(false);
         resetForm();
 
-        // Callback to parent component
         if (onProductAdded) {
           onProductAdded();
         }
       } else {
-        // Handle unexpected successful response status (e.g., 202, 204)
-        throw new Error(
-          `Unexpected server response status: ${response.status}`
-        );
+        throw new Error(`Unexpected server response status: ${response.status}`);
       }
     } catch (err) {
       console.error("Error adding product:", err);
@@ -272,17 +245,24 @@ export const AddProductButton = ({ onProductAdded }) => {
       let errorMsg = "Failed to add product";
 
       if (err.response) {
-        errorMsg =
-          err.response.data?.error ||
-          err.response.data?.message ||
-          `Server Error: ${err.response.status}`;
+        // Backend returned an error
+        const data = err.response.data;
+        
+        if (data?.error) {
+          errorMsg = data.error;
+        } else if (data?.details) {
+          // Mongoose validation errors
+          errorMsg = `Validation failed: ${data.details.join(", ")}`;
+        } else if (data?.message) {
+          errorMsg = data.message;
+        } else {
+          errorMsg = `Server Error: ${err.response.status}`;
+        }
       } else if (err.message) {
         errorMsg = err.message;
       }
 
-      toast.error(`${errorMsg}. Check console for details.`, {
-        id: loadingToast
-      });
+      toast.error(errorMsg, { id: loadingToast });
     } finally {
       setIsSubmitting(false);
     }
@@ -314,16 +294,13 @@ export const AddProductButton = ({ onProductAdded }) => {
       {/* Add Product Modal */}
       {isAdding && (
         <div className="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          {/* Backdrop */}
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
           <div className="fixed inset-0 z-10 overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               
-              {/* Modal Panel */}
               <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
                 
-                {/* Header */}
                 <div className="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center border-b border-gray-100">
                   <h3 className="text-lg font-semibold leading-6 text-gray-900" id="modal-title">
                     Create New Product
@@ -339,7 +316,6 @@ export const AddProductButton = ({ onProductAdded }) => {
                   </button>
                 </div>
 
-                {/* Form Content */}
                 <div className="px-4 py-5 sm:p-6">
                   <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
 
@@ -556,7 +532,6 @@ export const AddProductButton = ({ onProductAdded }) => {
                   </div>
                 </div>
 
-                {/* Footer Actions */}
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-100">
                   <button
                     type="button"

@@ -95,3 +95,43 @@ export const uploadProfilePicture = async (file, folder = "profilePicture") => {
     throw error;
   }
 };
+
+/**
+ * Deletes an image from Supabase Storage using its Public URL.
+ * Used when replacing profile pictures to keep storage clean.
+ * @param {string} imageUrl - The full public URL of the image to delete.
+ */
+export const deleteImageFromSupabase = async (imageUrl) => {
+  if (!imageUrl) return;
+
+  try {
+    // Check if the URL actually belongs to your Supabase project
+    if (!imageUrl.includes(SUPABASE_URL)) {
+      return; // Not a Supabase image, skip deletion
+    }
+
+    // URL format: .../storage/v1/object/public/images/Folder/Filename.jpg
+    // We need to extract: Folder/Filename.jpg
+    const bucketName = "images";
+    const pathParts = imageUrl.split(`${bucketName}/`);
+
+    if (pathParts.length < 2) {
+      console.warn("Could not parse Supabase path for deletion:", imageUrl);
+      return;
+    }
+
+    const pathToDelete = pathParts[1]; // The path relative to the bucket
+
+    const { error } = await supabase.storage
+      .from(bucketName)
+      .remove([pathToDelete]);
+
+    if (error) {
+      console.error("Error deleting old image from Supabase:", error);
+    } else {
+      console.log("Successfully deleted old image:", pathToDelete);
+    }
+  } catch (err) {
+    console.error("Unexpected error deleting image:", err);
+  }
+};

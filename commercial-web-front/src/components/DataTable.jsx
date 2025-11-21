@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 const DataTable = ({ reloadKey }) => {
   // --- State Management ---
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]); // For Search
-  const [searchTerm, setSearchTerm] = useState(""); // Search Term
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   
   // Edit / Modal State
@@ -16,8 +16,8 @@ const DataTable = ({ reloadKey }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const ProductsURL = "http://localhost:3000/api/product";
+  const URL = "http://localhost:3000";  
+  const ProductsURL = `${URL}/api/product`;
 
   // --- 1. Fetch Data ---
   useEffect(() => {
@@ -34,7 +34,7 @@ const DataTable = ({ reloadKey }) => {
         },
       });
       setProducts(res.data);
-      setFilteredProducts(res.data); // Initialize filtered list
+      setFilteredProducts(res.data);
       setLoading(false);
     } catch (err) {
       toast.error("Failed to load products");
@@ -85,7 +85,7 @@ const DataTable = ({ reloadKey }) => {
     setIsModalOpen(true);
   };
 
-  // Handle Input Change (Original Logic)
+  // Handle Input Change
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -100,7 +100,7 @@ const DataTable = ({ reloadKey }) => {
         return {
           ...prev,
           [name]: safeStock,
-          isAvailable: safeStock > 0 // stock > 0 → true, stock = 0 → false
+          isAvailable: safeStock > 0
         };
       }
 
@@ -122,32 +122,38 @@ const DataTable = ({ reloadKey }) => {
     setFormData({});
   };
 
-  // Save Updated Product (Original Validation & Logic)
+  // Save Updated Product - FIXED VERSION
   const handleUpdate = async () => {
-    // Validation
-    if (!formData.name?.trim()) {
+    // Trim all string values first
+    const trimmedName = formData.name?.trim();
+    const trimmedBrand = formData.brand?.trim();
+    const trimmedCategory = formData.category?.trim();
+    const trimmedDescription = formData.description?.trim();
+
+    // === VALIDATION (Same as AddProductButton) ===
+    if (!trimmedName) {
       toast.error("Product Name is required");
+      return;
+    }
+
+    if (!trimmedBrand) {
+      toast.error("Brand is required");
+      return;
+    }
+
+    if (!trimmedCategory) {
+      toast.error("Category is required");
+      return;
+    }
+
+    if (!trimmedDescription || trimmedDescription.length < 10) {
+      toast.error("Description must be at least 10 characters");
       return;
     }
 
     const priceNum = Number(formData.price);
     if (isNaN(priceNum) || priceNum <= 0) {
       toast.error("Valid price is required");
-      return;
-    }
-
-    if (!formData.brand?.trim()) {
-      toast.error("Brand is required");
-      return;
-    }
-
-    if (!formData.category?.trim()) {
-      toast.error("Category is required");
-      return;
-    }
-
-    if (!formData.description?.trim() || formData.description.trim().length < 10) {
-      toast.error("Description must be at least 10 characters");
       return;
     }
 
@@ -166,19 +172,29 @@ const DataTable = ({ reloadKey }) => {
       // Exclude fields that shouldn't be updated
       const { _id, productID, __v, createdAt, updatedAt, ...updateData } = formData;
 
-      // Calculate isAvailable based on stock
-      const finalStock = Number(updateData.stock);
+      // Calculate final values with STRICT TYPE CONVERSION (Same as AddProductButton)
+      const labelledPriceNum = Number(updateData.labelledPrice);
+      const finalStock = Math.max(0, stockNum); // Ensure non-negative
       const autoIsAvailable = finalStock > 0;
+
+      // Prepare update payload with proper types
+      const updatePayload = {
+        name: trimmedName,
+        brand: trimmedBrand,
+        category: trimmedCategory,
+        description: trimmedDescription,
+        price: priceNum, // Number
+        labelledPrice: (isNaN(labelledPriceNum) || labelledPriceNum <= 0) ? priceNum : labelledPriceNum, // Number
+        stock: finalStock, // Number (not string!)
+        isAvailable: autoIsAvailable, // Boolean
+        altName: updateData.altName?.trim() || "" // String (empty if not provided)
+      };
+
+      console.log("Sending update payload:", updatePayload);
 
       await axios.put(
         `${ProductsURL}/${editingProduct.productID}`,
-        {
-          ...updateData,
-          price: Number(updateData.price),
-          labelledPrice: Number(updateData.labelledPrice || updateData.price),
-          stock: finalStock,
-          isAvailable: autoIsAvailable // Auto-set based on stock
-        },
+        updatePayload,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -189,7 +205,24 @@ const DataTable = ({ reloadKey }) => {
       setEditingProduct(null);
       fetchProducts();
     } catch (err) {
-      toast.error(err.response?.data?.error || "Update failed", { id: toastId });
+      console.error("Update error:", err);
+      
+      let errorMsg = "Update failed";
+      
+      if (err.response?.data) {
+        const data = err.response.data;
+        
+        if (data.error) {
+          errorMsg = data.error;
+        } else if (data.details) {
+          // Mongoose validation errors
+          errorMsg = `Validation failed: ${data.details.join(", ")}`;
+        } else if (data.message) {
+          errorMsg = data.message;
+        }
+      }
+      
+      toast.error(errorMsg, { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
@@ -206,7 +239,7 @@ const DataTable = ({ reloadKey }) => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
       
-      {/* --- Header & Search Section --- */}
+      {/* Header & Search Section */}
       <div className="sm:flex sm:items-center sm:justify-between mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
@@ -234,7 +267,7 @@ const DataTable = ({ reloadKey }) => {
         </div>
       </div>
 
-      {/* --- DESKTOP VIEW (Table) --- */}
+      {/* DESKTOP VIEW (Table) */}
       <div className="hidden md:block bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -263,7 +296,7 @@ const DataTable = ({ reloadKey }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">
                     No products found.
                   </td>
                 </tr>
@@ -329,7 +362,7 @@ const DataTable = ({ reloadKey }) => {
         </div>
       </div>
 
-      {/* --- MOBILE VIEW (Cards) --- */}
+      {/* MOBILE VIEW (Cards) */}
       <div className="md:hidden grid grid-cols-1 gap-4">
         {filteredProducts.length === 0 ? (
           <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow">No products found.</div>
@@ -384,7 +417,7 @@ const DataTable = ({ reloadKey }) => {
         )}
       </div>
 
-      {/* --- EDIT MODAL (Original Detailed Form) --- */}
+      {/* EDIT MODAL */}
       {isModalOpen && editingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8 p-8">
@@ -394,19 +427,23 @@ const DataTable = ({ reloadKey }) => {
                 <button 
                     onClick={handleClose}
                     className="text-gray-400 hover:text-gray-600 transition"
+                    aria-label="Close modal"
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Product ID - Read Only */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-productID" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Product ID (Read-only)
                 </label>
                 <input
                   type="text"
+                  id="edit-productID"
                   name="productID"
                   value={formData.productID || ""}
                   disabled
@@ -416,11 +453,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Product Name */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-name" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Product Name <span className="text-red-500">*</span>
                 </label>
                 <input
                     type="text"
+                    id="edit-name"
                     name="name"
                     value={formData.name || ""}
                     onChange={handleInputChange}
@@ -432,11 +470,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Brand */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-brand" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Brand <span className="text-red-500">*</span>
                 </label>
                 <input
                     type="text"
+                    id="edit-brand"
                     name="brand"
                     value={formData.brand || ""}
                     onChange={handleInputChange}
@@ -448,11 +487,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-category" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Category <span className="text-red-500">*</span>
                 </label>
                 <input
                     type="text"
+                    id="edit-category"
                     name="category"
                     value={formData.category || ""}
                     onChange={handleInputChange}
@@ -464,11 +504,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Price */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-price" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Price (LKR) <span className="text-red-500">*</span>
                 </label>
                 <input
                     type="number"
+                    id="edit-price"
                     name="price"
                     value={formData.price || ""}
                     onChange={handleInputChange}
@@ -482,11 +523,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Labelled Price */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-labelledPrice" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     MRP / Labelled Price
                 </label>
                 <input
                     type="number"
+                    id="edit-labelledPrice"
                     name="labelledPrice"
                     value={formData.labelledPrice || ""}
                     onChange={handleInputChange}
@@ -499,11 +541,12 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Stock */}
               <div>
-                 <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                 <label htmlFor="edit-stock" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Stock Quantity
                  </label>
                 <input
                     type="number"
+                    id="edit-stock"
                     name="stock"
                     value={formData.stock || 0}
                     onChange={handleInputChange}
@@ -515,11 +558,12 @@ const DataTable = ({ reloadKey }) => {
 
                {/* Alt Name */}
                <div>
-                 <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                 <label htmlFor="edit-altName" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Alternate Name
                  </label>
                  <input
                     type="text"
+                    id="edit-altName"
                     name="altName"
                     value={formData.altName || ""}
                     onChange={handleInputChange}
@@ -554,10 +598,11 @@ const DataTable = ({ reloadKey }) => {
 
               {/* Description */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+                <label htmlFor="edit-description" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
                     Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  id="edit-description"
                   name="description"
                   value={formData.description || ""}
                   onChange={handleInputChange}

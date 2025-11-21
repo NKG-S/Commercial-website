@@ -1,18 +1,42 @@
+// commercial-web-back/Routes/userRoutes.js
 import express from "express";
-import { createUser, getUser, logInUser, checkEmail } from "../Controllers/userController.js";
+import { 
+    createUser, 
+    getUser, 
+    logInUser, 
+    checkEmail, 
+    getUserProfile,
+    updateUserProfile,
+    deleteUserProfile,
+    addToCart,
+    getCart,
+    removeFromCart
+} from "../Controllers/userController.js"
 
-const userRouter = express.Router();
+// Middleware to ensure user is authenticated
+const requireAuth = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+    }
+    next();
+};
 
-// Route to check availability (Frontend Step 1)
-userRouter.post("/check-email", checkEmail);
+const userRouter = express.Router()
 
-// Route to register a new user (Frontend Step 3)
-userRouter.post("/", createUser);
+// Public Routes
+userRouter.post("/check-email", checkEmail)
+userRouter.post("/", createUser)
+userRouter.post("/login", logInUser)
+userRouter.post("/getUser", getUser)
 
-// Route to login
-userRouter.post("/login", logInUser);
+// Protected Routes (Cart) - MUST have authentication
+userRouter.post("/cart/:productId", requireAuth, addToCart);
+userRouter.get("/cart", requireAuth, getCart);
+userRouter.delete("/cart/:productId", requireAuth, removeFromCart);
 
-// Route to get all users (Admin)
-userRouter.post("/getUser", getUser);
+// Protected Routes (Profile)
+userRouter.get("/profile", requireAuth, getUserProfile)
+userRouter.put("/profile", requireAuth, updateUserProfile)
+userRouter.delete("/profile", requireAuth, deleteUserProfile)
 
 export default userRouter;
